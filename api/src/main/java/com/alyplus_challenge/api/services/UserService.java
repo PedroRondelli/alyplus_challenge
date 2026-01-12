@@ -1,5 +1,6 @@
 package com.alyplus_challenge.api.services;
 
+import com.alyplus_challenge.api.dto.user.SignInDTO;
 import com.alyplus_challenge.api.dto.user.SignUpDTO;
 import com.alyplus_challenge.api.models.user.UserModel;
 import com.alyplus_challenge.api.repository.user.UserRepository;
@@ -25,5 +26,22 @@ public class UserService {
     user.setPassword_hash(encryptedPassword);
     UserModel saved = userRepository.save(user);
     return "Created user: " + saved.getId();
+  }
+
+  public String signInUser(SignInDTO dto) {
+
+    var user = userRepository.findByEmail(dto.email());
+
+    if (user.isEmpty()) {
+      return "User not found";
+    }
+
+    UserModel userModel = user.get();
+
+    if (passwordEncoder.matches(dto.password(), userModel.getPassword_hash())) {
+      return "Signed in user: " + userModel.getId();
+    }
+
+    return "Invalid credentials";
   }
 }
