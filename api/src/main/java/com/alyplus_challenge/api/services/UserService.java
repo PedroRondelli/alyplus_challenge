@@ -17,6 +17,7 @@ public class UserService {
   }
 
   @Autowired private UserRepository userRepository;
+  @Autowired private TokenService tokenService;
 
   public String createUser(SignUpDTO dto) {
 
@@ -39,7 +40,8 @@ public class UserService {
     UserModel userModel = user.get();
 
     if (passwordEncoder.matches(dto.password(), userModel.getPassword_hash())) {
-      return "Signed in user: " + userModel.getId();
+      String token = tokenService.generateToken(userModel);
+      return "Signed in user: " + userModel.getId() + " Token: " + token;
     }
 
     return "Invalid credentials";
