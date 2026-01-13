@@ -24,6 +24,7 @@ public class TokenService {
           JWT.create()
               .withIssuer("login-auth-api")
               .withSubject(user.getEmail())
+              .withClaim("role", user.getRole().toString())
               .withExpiresAt(this.generateExpirationDate())
               .sign(algorithm);
       return token;
@@ -36,6 +37,21 @@ public class TokenService {
     try {
       Algorithm algorithm = Algorithm.HMAC256(secret);
       return JWT.require(algorithm).withIssuer("login-auth-api").build().verify(token).getSubject();
+    } catch (JWTVerificationException exception) {
+      return null;
+    }
+  }
+
+  public String extractRole(String token) {
+    try {
+      Algorithm algorithm = Algorithm.HMAC256(secret);
+      String role = JWT.require(algorithm)
+              .withIssuer("login-auth-api")
+              .build()
+              .verify(token)
+              .getClaim("role")
+              .asString();
+              return role;
     } catch (JWTVerificationException exception) {
       return null;
     }
